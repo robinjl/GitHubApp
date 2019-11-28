@@ -20,7 +20,7 @@ const MainNavigator = createStackNavigator({
       header: null,
     },
   },
-  Detail: DetailPage
+  Detail: DetailPage,
 });
 
 export default createAppContainer(
