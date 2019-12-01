@@ -4,7 +4,6 @@ import NavigatorUtil from '../navigator/NavigatorUtil';
 
 export default class WelcomePage extends Component {
   componentDidMount() {
-    console.log(this.props);
     this.timer = setTimeout(
       () => NavigatorUtil.navigateToHome(this.props),
       1000,

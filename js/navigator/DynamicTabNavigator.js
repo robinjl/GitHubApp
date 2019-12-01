@@ -8,6 +8,7 @@ import PopularPage from '../page/PopularPage';
 import TrendingPage from '../page/TrendingPage';
 import FavoritePage from '../page/FavoritePage';
 import MyPage from '../page/MyPage';
+import { connect } from 'react-redux';
 
 const TABS = {
   Popular: {
@@ -53,9 +54,13 @@ class DynamicTabNavigator extends Component {
     const {Popular, Trending, Favorite, My} = TABS;
     const tabs = {Popular, Trending, Favorite, My};
     // Popular.navigationOptions.tabBarLabel = 'abc';
-    return createAppContainer(createBottomTabNavigator(tabs, {
-      tabBarComponent: TabBarComponent,
-    }));
+    // fix 重复渲染
+    if(!this.tabNavigator){
+      this.tabNavigator = createAppContainer(createBottomTabNavigator(tabs, {
+        tabBarComponent: props => <BottomTabBar {...props} activeTintColor={this.props.theme}/>,
+      }));
+    }
+    return this.tabNavigator;
   }
 
   render() {
@@ -87,4 +92,8 @@ class TabBarComponent extends Component {
   }
 }
 
-export default DynamicTabNavigator;
+const mapStateToProps = (store) => ({
+  theme: store.theme.theme,
+});
+
+export default connect(mapStateToProps)(DynamicTabNavigator);
