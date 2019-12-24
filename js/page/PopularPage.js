@@ -45,6 +45,7 @@ export default class PopularPage extends Component {
     // console.disableYellowBox = true;
     YellowBox.ignoreWarnings([
       'You should only render one navigator explicitly in your app, and other navigators should be rendered by including them in that navigator. Full details at:',
+      'AsyncStorage'
     ]);
     const tabs = this._renderTopTabs();
     const TabNavigator = createAppContainer(
