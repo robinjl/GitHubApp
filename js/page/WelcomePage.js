@@ -6,7 +6,7 @@ export default class WelcomePage extends Component {
   componentDidMount() {
     this.timer = setTimeout(
       () => NavigatorUtil.navigateToHome(this.props),
-      1000,
+      100,
     );
   }
 
