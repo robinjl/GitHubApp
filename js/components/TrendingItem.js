@@ -2,33 +2,49 @@ import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { THEME_COLOR } from '../common/constants';
+import HTMLView from 'react-native-htmlview'; // 显示 HTML 标签
 
-class PopularItem extends Component {
+class TrendingItem extends Component {
   render() {
     const { data, onSelect } = this.props;
-    const { owner, full_name, description, stargazers_count } = data;
-    if (!data || !owner) return null;
-    const { avatar_url } = owner;
+    const { fullName, description, meta, starCount, contributors } = data;
+    if (!data) return null;
     const FavoriteButton = (
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity onPress={()=>{}}>
         <Icon size={26} name="star-o" style={styles.icon} />
       </TouchableOpacity>
     );
     return (
       <TouchableOpacity style={styles.container} onPress={() => onSelect(data)}>
         <View>
-          <Text style={styles.title}>{full_name}</Text>
-          <Text style={styles.description}>{description}</Text>
+          <Text style={styles.title}>{fullName}</Text>
+          {description ? (
+            <HTMLView
+              value={`<p>${description}</p>`}
+              onLinkPress={() => {}}
+              stylesheet={{
+                p: styles.description,
+                a: styles.description
+              }}
+            />
+          ) : null}
+          <Text style={styles.description}>{meta}</Text>
           <View style={styles.row}>
             <View style={styles.row}>
-              <Text>Author: </Text>
-              {avatar_url ? (
-                <Image source={{ uri: avatar_url }} style={styles.avatar} />
-              ) : null}
+              <Text>Built by: </Text>
+              {contributors.map(avatar_url => {
+                return avatar_url ? (
+                  <Image
+                    key={avatar_url}
+                    source={{ uri: avatar_url }}
+                    style={styles.avatar}
+                  />
+                ) : null;
+              })}
             </View>
             <View style={styles.row}>
               <Text>Start: </Text>
-              <Text>{stargazers_count}</Text>
+              <Text>{starCount}</Text>
             </View>
             {FavoriteButton}
           </View>
@@ -55,7 +71,8 @@ const styles = StyleSheet.create({
   },
   avatar: {
     width: 22,
-    height: 22
+    height: 22,
+    marginRight: 5
   },
   row: {
     flexDirection: 'row',
@@ -78,4 +95,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default PopularItem;
+export default TrendingItem;

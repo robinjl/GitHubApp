@@ -57,6 +57,7 @@ class DynamicTabNavigator extends Component {
     // fix 重复渲染
     if(!this.tabNavigator){
       this.tabNavigator = createAppContainer(createBottomTabNavigator(tabs, {
+        initialRouteName: 'Popular',
         tabBarComponent: props => <BottomTabBar {...props} activeTintColor={this.props.theme}/>,
       }));
     }

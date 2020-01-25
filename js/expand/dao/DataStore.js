@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
+import { TAB_FLAG } from '../../common/constants';
+import GitHubTrending from 'GitHubTrending';
 
 export default class DataStore {
   // 保存数据
@@ -9,7 +11,7 @@ export default class DataStore {
   }
 
   _formatData(data) {
-    return JSON.stringify({data, timestamp: new Date().getTime()});
+    return JSON.stringify({ data, timestamp: new Date().getTime() });
   }
 
   // 获取本地数据
@@ -30,16 +32,31 @@ export default class DataStore {
   }
 
   // 获取服务器数据
-  fetchRemoteData(url) {
+  fetchRemoteData(url, flag) {
     return new Promise((resolve, reject) => {
-      fetch(url)
+      if (flag === TAB_FLAG.popular) {
+        fetch(url)
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error('Something is wrong with network!');
+          })
+          .then(response => {
+            this.saveData(url, response);
+            resolve(response);
+          })
+          .catch(error => {
+            reject(error);
+          });
+        return;
+      }
+      new GitHubTrending()
+        .fetchTrending(url)
         .then(response => {
-          if (response.ok) {
-            return response.json();
+          if (!response) {
+            throw new Error('no response');
           }
-          throw new Error('Something is wrong with network!');
-        })
-        .then(response => {
           this.saveData(url, response);
           resolve(response);
         })
@@ -50,14 +67,14 @@ export default class DataStore {
   }
 
   // 根据离线策略获取数据
-  fetchData(url) {
+  fetchData(url, flag) {
     return new Promise((resolve, reject) => {
       this.fetchLocalData(url)
         .then(response => {
           if (response && this.checkTimestampValid(response.timestamp)) {
             resolve(response);
           } else {
-            this.fetchRemoteData(url)
+            this.fetchRemoteData(url, flag)
               .then(response => {
                 resolve(this._formatData(response));
               })

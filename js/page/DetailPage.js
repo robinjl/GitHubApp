@@ -1,11 +1,64 @@
-import React, {Component} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import React, { Component } from 'react';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import WebView from 'react-native-webview';
+import NavigationBar from '../components/NavigationBar';
+import { GITHUB_URL, THEME_COLOR } from '../common/constants';
+import ViewUtil from '../common/ViewUtil';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import NavigatorUtil from '../navigator/NavigatorUtil';
 
 export default class DetailPage extends Component {
+  constructor(props) {
+    super(props);
+    const { data } = this.props.navigation.state.params;
+    this.state = {
+      title: data.full_name || data.fullName,
+      uri: data.html_url || GITHUB_URL + data.fullName,
+      canGoBack: false // WebView 返回上一页标识
+    };
+  }
+
+  goBack = () => {
+    if (this.state.canGoBack) {
+      this.webview.goBack(); // WebView history
+      return;
+    }
+    NavigatorUtil.goBack(this.props.navigation);
+  };
+
+  onNavigationStateChange = navState => {
+    this.setState({
+      canGoBack: navState.canGoBack,
+      uri: navState.url
+    });
+  };
+
+  renderRightButton = () => (
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <TouchableOpacity onPress={() => {}}>
+        <FontAwesome size={24} name="star-o" color="#fff" />
+      </TouchableOpacity>
+      {ViewUtil.renderShareButton()}
+    </View>
+  );
+
   render() {
+    const { title, uri } = this.state;
     return (
       <View style={styles.container}>
-        <Text>DetailPage</Text>
+        <NavigationBar
+          title={title}
+          titleLayoutStyle={title.length > 20 && { marginRight: 30 }}
+          leftButton={ViewUtil.renderLeftButton(this.goBack)}
+          rightButton={this.renderRightButton()}
+          style={{ backgroundColor: THEME_COLOR }}
+        />
+        <WebView
+          ref={webview => (this.webview = webview)}
+          startInLoadingState
+          onNavigationStateChange={e => this.onNavigationStateChange(e)}
+          source={{ uri }}
+        />
       </View>
     );
   }
@@ -13,8 +66,6 @@ export default class DetailPage extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+    flex: 1
+  }
 });

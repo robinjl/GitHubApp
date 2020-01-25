@@ -8,4 +8,8 @@ export default class NavigatorUtil {
     const navigation = NavigatorUtil.navigation;
     navigation.navigate(path, params);
   }
+
+  static goBack(navigation){
+    navigation.goBack();
+  }
 }

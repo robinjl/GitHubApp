@@ -5,15 +5,23 @@ import {
   StyleSheet,
   FlatList,
   RefreshControl,
-  ActivityIndicator
+  ActivityIndicator,
+  DeviceInfo
 } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
 import { connect } from 'react-redux';
 import actions from '../action';
-import { QUERY_STRING, URL, THEME_COLOR, PAGE_SIZE } from '../common/constants';
+import {
+  POPULAR_QUERY_STRING,
+  POPULAR_URL,
+  THEME_COLOR,
+  PAGE_SIZE
+} from '../common/constants';
 import PopularItem from '../components/PopularItem';
 import Toast from 'react-native-easy-toast';
+import NavigationBar from '../components/NavigationBar';
+import NavigatorUtil from '../navigator/NavigatorUtil';
 
 class PopularTab extends Component {
   componentDidMount() {
@@ -49,9 +57,16 @@ class PopularTab extends Component {
     fetchPopular(tabLabel, url, PAGE_SIZE);
   };
 
-  generateFetchUrl = key => URL + key + QUERY_STRING;
+  generateFetchUrl = key => POPULAR_URL + key + POPULAR_QUERY_STRING;
 
-  renderItem = ({ item }) => <PopularItem data={item} />;
+  renderItem = ({ item }) => (
+    <PopularItem
+      data={item}
+      onSelect={() => {
+        NavigatorUtil.navigate('Detail', { data: item });
+      }}
+    />
+  );
 
   renderIndicator = () => {
     const store = this._getStore();
@@ -156,9 +171,7 @@ export default class PopularPage extends Component {
           tabStyle: styles.tabStyle,
           upperCaseLabel: true,
           scrollEnabled: true,
-          style: {
-            backgroundColor: 'purple'
-          },
+          style: styles.tabBarStyle,
           indicatorStyle: styles.indicatorStyle,
           labelStyle: styles.labelStyle
         }
@@ -166,6 +179,7 @@ export default class PopularPage extends Component {
     );
     return (
       <View style={styles.container}>
+        <NavigationBar title="最热" />
         <TabNavigator />
       </View>
     );
@@ -174,7 +188,7 @@ export default class PopularPage extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 30,
+    marginTop: DeviceInfo.isIPhoneX_deprecated ? 30 : 0,
     flex: 1
   },
   pageContainer: {
@@ -183,14 +197,19 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   tabStyle: {
-    minWidth: 50
+    padding: 0
+  },
+  tabBarStyle: {
+    backgroundColor: 'purple',
+    height: 30 // 解决 scrollEnabled = true 导致 Android 初次渲染闪烁问题
   },
   indicatorStyle: {
     height: 2,
     backgroundColor: '#fff'
   },
   labelStyle: {
-    fontSize: 13
+    fontSize: 13,
+    paddingBottom: 15
   },
   indicatorContainer: {
     alignItems: 'center',

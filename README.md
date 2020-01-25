@@ -27,6 +27,12 @@
    FlatList data 不是 array
 
 3. FlatList onEndReached 调用两次的问题解决
-   在 onEndReached 及 onMomentumScrollBegin 中增加标识判断   
-   同时为了确保 onEndReached 在 onMomentumScrollBegin 之后执行，在 onEndReached 中加入了 setTimeout，经验值 100ms    
+   在 onEndReached 及 onMomentumScrollBegin 中增加标识判断  
+   同时为了确保 onEndReached 在 onMomentumScrollBegin 之后执行，在 onEndReached 中加入了 setTimeout，经验值 100ms  
    issue [FlatList onEndReached triggered 2 times](https://github.com/facebook/react-native/issues/14015)
+
+4. 点击 mask 关闭 TrendingDialog 有抖动闪烁问题  
+   这是因为 Debug 包动画执行的比较慢，release 之后会好。
+
+5. Android 物理返回键  
+   章节：【8-10】

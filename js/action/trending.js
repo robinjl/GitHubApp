@@ -2,21 +2,21 @@ import types from './types';
 import DataStore from '../expand/dao/DataStore';
 import { TAB_FLAG } from '../common/constants';
 
-export function fetchPopular(storeName, url, pageSize) {
+export function fetchTrending(storeName, url, pageSize) {
   return dispatch => {
     dispatch({
-      type: types.POPULAR_FETCH,
+      type: types.TRENDING_FETCH,
       storeName,
       hideLoadingMore: true
     });
     const dataStore = new DataStore();
     dataStore
-      .fetchData(url, TAB_FLAG.popular)
+      .fetchData(url, TAB_FLAG.trending)
       .then(data => {
         if (data && data.data) {
-          const { items } = data.data;
+          const items = data.data;
           dispatch({
-            type: types.POPULAR_FETCH_SUCCESS,
+            type: types.TRENDING_FETCH_SUCCESS,
             storeName,
             originData: items, // 保存原始数据
             data: pageSize > items.length ? items : items.slice(0, pageSize), // 首次获取数据
@@ -26,7 +26,7 @@ export function fetchPopular(storeName, url, pageSize) {
       })
       .catch(error => {
         dispatch({
-          type: types.POPULAR_FETCH_FAIL,
+          type: types.TRENDING_FETCH_FAIL,
           storeName,
           error
         });
@@ -44,7 +44,7 @@ export function fetchPopular(storeName, url, pageSize) {
  * @returns {function(...[*]=)}
  */
 
-export function fetchMorePopular(
+export function fetchMoreTrending(
   storeName,
   pageNumber,
   pageSize,
@@ -57,7 +57,7 @@ export function fetchMorePopular(
       if ((pageNumber - 1) * pageSize >= len) {
         // 没有更多数据
         dispatch({
-          type: types.POPULAR_FETCH_MORE_FAIL,
+          type: types.TRENDING_FETCH_MORE_FAIL,
           storeName,
           error: 'no more',
           pageNumber: --pageNumber
@@ -68,7 +68,7 @@ export function fetchMorePopular(
       } else {
         const count = pageNumber * pageSize > len ? len : pageNumber * pageSize;
         dispatch({
-          type: types.POPULAR_FETCH_MORE_SUCCESS,
+          type: types.TRENDING_FETCH_MORE_SUCCESS,
           storeName,
           data: originData.slice(0, count),
           pageNumber
