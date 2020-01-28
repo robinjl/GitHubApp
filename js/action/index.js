@@ -1,6 +1,7 @@
 import { changeTheme, intiTheme } from './theme';
 import { fetchPopular, fetchMorePopular } from './popular';
 import { fetchTrending, fetchMoreTrending } from './trending';
+import { fetchFavorite } from './favorite';
 
 export default {
   changeTheme,
@@ -8,5 +9,6 @@ export default {
   fetchPopular,
   fetchMorePopular,
   fetchTrending,
-  fetchMoreTrending
+  fetchMoreTrending,
+  fetchFavorite
 };

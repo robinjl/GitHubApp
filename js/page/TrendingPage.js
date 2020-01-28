@@ -14,7 +14,7 @@ import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
 import { connect } from 'react-redux';
 import actions from '../action';
 import {
-  TRENDING_QUERY_STRING,
+  TAB_FLAG,
   TRENDING_URL,
   THEME_COLOR,
   PAGE_SIZE
@@ -26,7 +26,10 @@ import TrendingDialog from '../components/TrendingDialog';
 import { TIME_SPANS } from '../common/model';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import NavigatorUtil from '../navigator/NavigatorUtil';
+import FavoriteDAO from '../expand/dao/FavoriteDAO';
+import FavoriteUtil from '../common/FavoriteUtil';
 
+const favoriteDAO = new FavoriteDAO(TAB_FLAG.trending);
 const EVENT_TYPE_TIME_SPAN_CHANGE = 'EVENT_TYPE_TIME_SPAN_CHANGE';
 
 class TrendingTab extends Component {
@@ -89,10 +92,30 @@ class TrendingTab extends Component {
 
   renderItem = ({ item }) => (
     <TrendingItem
-      data={item}
-      onSelect={() => {
-        NavigatorUtil.navigate('Detail', { data: item });
+      data={item.data}
+      isFavorite={item.isFavorite}
+      onSelect={callback => {
+        NavigatorUtil.navigate('Detail', {
+          data: item.data,
+          isFavorite: item.isFavorite,
+          callback,
+          onFavorite: isFavorite =>
+            FavoriteUtil.onFavorite(
+              item.data,
+              isFavorite,
+              TAB_FLAG.trending,
+              favoriteDAO
+            )
+        });
       }}
+      onFavorite={() =>
+        FavoriteUtil.onFavorite(
+          item.data,
+          !item.isFavorite,
+          TAB_FLAG.trending,
+          favoriteDAO
+        )
+      }
     />
   );
 
@@ -113,7 +136,7 @@ class TrendingTab extends Component {
         <FlatList
           data={store.data}
           renderItem={this.renderItem}
-          keyExtractor={item => item.fullName}
+          keyExtractor={item => item.data.fullName}
           refreshControl={
             <RefreshControl
               refreshing={store.loading}
@@ -151,7 +174,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => {
   return {
     fetchTrending: (storeName, url, pageSize) =>
-      dispatch(actions.fetchTrending(storeName, url, pageSize)),
+      dispatch(actions.fetchTrending(storeName, url, pageSize, favoriteDAO)),
     fetchMoreTrending: (storeName, url, pageNumber, pageSize, callback) =>
       dispatch(
         actions.fetchMoreTrending(
@@ -159,7 +182,8 @@ const mapDispatchToProps = dispatch => {
           url,
           pageNumber,
           pageSize,
-          callback
+          callback,
+          favoriteDAO
         )
       )
   };

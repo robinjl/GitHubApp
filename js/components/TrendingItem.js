@@ -1,21 +1,16 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { THEME_COLOR } from '../common/constants';
-import HTMLView from 'react-native-htmlview'; // 显示 HTML 标签
+import HTMLView from 'react-native-htmlview';
+import BaseItem from './BaseItem'; // 显示 HTML 标签
 
-class TrendingItem extends Component {
+class TrendingItem extends BaseItem {
   render() {
-    const { data, onSelect } = this.props;
+    const { data } = this.props;
     const { fullName, description, meta, starCount, contributors } = data;
     if (!data) return null;
-    const FavoriteButton = (
-      <TouchableOpacity onPress={()=>{}}>
-        <Icon size={26} name="star-o" style={styles.icon} />
-      </TouchableOpacity>
-    );
     return (
-      <TouchableOpacity style={styles.container} onPress={() => onSelect(data)}>
+      <TouchableOpacity style={styles.container} onPress={this.onItemClick}>
         <View>
           <Text style={styles.title}>{fullName}</Text>
           {description ? (
@@ -46,7 +41,7 @@ class TrendingItem extends Component {
               <Text>Start: </Text>
               <Text>{starCount}</Text>
             </View>
-            {FavoriteButton}
+            {this._renderFavoriteIcon()}
           </View>
         </View>
       </TouchableOpacity>

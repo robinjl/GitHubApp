@@ -2,7 +2,11 @@
 
 [慕课网 - 新版 React Native 从入门到实战打造高质量上线 App（再升级）](https://coding.imooc.com/learn/list/304.html)
 
-## issues
+## Concepts
+
+1. DAO Data Access Object 数据访问对象
+
+## Issues
 
 1. dispatch is not a function  
    正确写法：
@@ -32,7 +36,18 @@
    issue [FlatList onEndReached triggered 2 times](https://github.com/facebook/react-native/issues/14015)
 
 4. 点击 mask 关闭 TrendingDialog 有抖动闪烁问题  
-   这是因为 Debug 包动画执行的比较慢，release 之后会好。
+   这是因为 Debug 包动画执行的比较慢，release 之后会好
 
-5. Android 物理返回键  
-   章节：【8-10】
+## Chapter
+
+1. 第 7 章
+   初次加载不显示数据 待解决    
+   FlatList 分页加载优化
+
+2. 第 8 章
+   【8-10】Android 物理返回键
+
+3. 第 9 章 收藏模块
+   实际收藏是要与后台交互的
+   【9-4】 详情收藏 -> 列表更新 -> 返回详情状态没有改变, 待解决
+   【9-6】tab 页面事件传递

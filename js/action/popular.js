@@ -1,8 +1,9 @@
 import types from './types';
 import DataStore from '../expand/dao/DataStore';
 import { TAB_FLAG } from '../common/constants';
+import { formatProject } from '../common/ActionUtil';
 
-export function fetchPopular(storeName, url, pageSize) {
+export function fetchPopular(storeName, url, pageSize, favoriteDAO) {
   return dispatch => {
     dispatch({
       type: types.POPULAR_FETCH,
@@ -15,13 +16,17 @@ export function fetchPopular(storeName, url, pageSize) {
       .then(data => {
         if (data && data.data) {
           const { items } = data.data;
-          dispatch({
-            type: types.POPULAR_FETCH_SUCCESS,
-            storeName,
-            originData: items, // 保存原始数据
-            data: pageSize > items.length ? items : items.slice(0, pageSize), // 首次获取数据
-            pageNumber: 1
-          });
+          const initItems =
+            pageSize > items.length ? items : items.slice(0, pageSize); // 首次获取数据
+          void formatProject(initItems, favoriteDAO, data => {
+            dispatch({
+              type: types.POPULAR_FETCH_SUCCESS,
+              storeName,
+              originData: items, // 保存原始数据
+              data,
+              pageNumber: 1
+            });
+          }); // 格式化数据结构，增加 isFavorite 属性
         }
       })
       .catch(error => {
@@ -41,6 +46,7 @@ export function fetchPopular(storeName, url, pageSize) {
  * @param pageSize
  * @param originData
  * @param callback
+ * @param favoriteDAO
  * @returns {function(...[*]=)}
  */
 
@@ -49,7 +55,8 @@ export function fetchMorePopular(
   pageNumber,
   pageSize,
   originData,
-  callback
+  callback,
+  favoriteDAO
 ) {
   return dispatch => {
     const len = originData.length;
@@ -67,11 +74,14 @@ export function fetchMorePopular(
         }
       } else {
         const count = pageNumber * pageSize > len ? len : pageNumber * pageSize;
-        dispatch({
-          type: types.POPULAR_FETCH_MORE_SUCCESS,
-          storeName,
-          data: originData.slice(0, count),
-          pageNumber
+        const items = originData.slice(0, count);
+        void formatProject(items, favoriteDAO, data => {
+          dispatch({
+            type: types.POPULAR_FETCH_MORE_SUCCESS,
+            storeName,
+            data,
+            pageNumber
+          });
         });
       }
     }, 500);

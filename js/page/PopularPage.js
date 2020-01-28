@@ -16,12 +16,17 @@ import {
   POPULAR_QUERY_STRING,
   POPULAR_URL,
   THEME_COLOR,
-  PAGE_SIZE
+  PAGE_SIZE,
+  TAB_FLAG
 } from '../common/constants';
 import PopularItem from '../components/PopularItem';
 import Toast from 'react-native-easy-toast';
 import NavigationBar from '../components/NavigationBar';
 import NavigatorUtil from '../navigator/NavigatorUtil';
+import FavoriteUtil from '../common/FavoriteUtil';
+import FavoriteDAO from '../expand/dao/FavoriteDAO';
+
+const favoriteDAO = new FavoriteDAO(TAB_FLAG.popular);
 
 class PopularTab extends Component {
   componentDidMount() {
@@ -61,10 +66,30 @@ class PopularTab extends Component {
 
   renderItem = ({ item }) => (
     <PopularItem
-      data={item}
-      onSelect={() => {
-        NavigatorUtil.navigate('Detail', { data: item });
+      data={item.data}
+      isFavorite={item.isFavorite}
+      onSelect={callback => {
+        NavigatorUtil.navigate('Detail', {
+          data: item.data,
+          isFavorite: item.isFavorite,
+          callback,
+          onFavorite: isFavorite =>
+            FavoriteUtil.onFavorite(
+              item.data,
+              isFavorite,
+              TAB_FLAG.popular,
+              favoriteDAO
+            )
+        });
       }}
+      onFavorite={() =>
+        FavoriteUtil.onFavorite(
+          item.data,
+          !item.isFavorite,
+          TAB_FLAG.popular,
+          favoriteDAO
+        )
+      }
     />
   );
 
@@ -85,7 +110,7 @@ class PopularTab extends Component {
         <FlatList
           data={store.data}
           renderItem={this.renderItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item => item.data.id.toString()}
           refreshControl={
             <RefreshControl
               refreshing={store.loading}
@@ -123,11 +148,19 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => {
   return {
     fetchPopular: (storeName, url, pageSize) =>
-      dispatch(actions.fetchPopular(storeName, url, pageSize)),
+      dispatch(actions.fetchPopular(storeName, url, pageSize, favoriteDAO)),
     fetchMorePopular: (storeName, url, pageNumber, pageSize, callback) =>
       dispatch(
-        actions.fetchMorePopular(storeName, url, pageNumber, pageSize, callback)
-      )
+        actions.fetchMorePopular(
+          storeName,
+          url,
+          pageNumber,
+          pageSize,
+          callback,
+          favoriteDAO
+        )
+      ),
+    favoriteDAO
   };
 };
 

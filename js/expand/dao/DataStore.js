@@ -17,7 +17,7 @@ export default class DataStore {
   // 获取本地数据
   fetchLocalData(url) {
     return new Promise((resolve, reject) => {
-      void AsyncStorage.getItem(url, (error, result) => {
+      AsyncStorage.getItem(url, (error, result) => {
         if (!error) {
           try {
             resolve(JSON.parse(result));

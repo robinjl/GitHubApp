@@ -1,11 +1,22 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Button } from 'react-native';
 import NavigationBar from '../components/NavigationBar';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { THEME_COLOR } from '../common/constants';
+import actions from '../action';
+import { connect } from 'react-redux';
 
-export default class MyPage extends Component {
+function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+class MyPage extends Component {
   renderLeftButton = (
     <TouchableOpacity onPress={() => {}}>
       <Ionicons size={24} name="ios-arrow-back" style={styles.leftButton} />
@@ -16,6 +27,13 @@ export default class MyPage extends Component {
       <Feather size={24} name="search" style={styles.rightButton} />
     </TouchableOpacity>
   );
+
+  onChangeTheme = () => {
+    const color = getRandomColor();
+    this.props.changeTheme(color);
+  };
+
+  onInitTheme = () => this.props.initTheme();
 
   render() {
     return (
@@ -28,10 +46,19 @@ export default class MyPage extends Component {
           rightButton={this.renderRightButton}
         />
         <Text>MyPage</Text>
+        <Button onPress={this.onChangeTheme} title={'change theme'} />
+        <Button onPress={this.onInitTheme} title={'initialize theme'} />
       </View>
     );
   }
 }
+
+const mapDispatchToProps = dispatch => ({
+  changeTheme: theme => dispatch(actions.changeTheme(theme)),
+  initTheme: ()=> dispatch(actions.intiTheme()),
+});
+
+export default connect(null, mapDispatchToProps)(MyPage);
 
 const styles = StyleSheet.create({
   container: {
@@ -46,3 +73,4 @@ const styles = StyleSheet.create({
     color: '#fff'
   }
 });
+

@@ -2,21 +2,17 @@ import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { THEME_COLOR } from '../common/constants';
+import BaseItem from './BaseItem';
 
-class PopularItem extends Component {
+class PopularItem extends BaseItem {
   render() {
-    const { data, onSelect } = this.props;
+    const { data } = this.props;
     const { owner, full_name, description, stargazers_count } = data;
     if (!data || !owner) return null;
     const { avatar_url } = owner;
-    const FavoriteButton = (
-      <TouchableOpacity onPress={() => {}}>
-        <Icon size={26} name="star-o" style={styles.icon} />
-      </TouchableOpacity>
-    );
     return (
-      <TouchableOpacity style={styles.container} onPress={() => onSelect(data)}>
-        <View>
+      <TouchableOpacity style={styles.container} onPress={this.onItemClick}>
+        <>
           <Text style={styles.title}>{full_name}</Text>
           <Text style={styles.description}>{description}</Text>
           <View style={styles.row}>
@@ -30,9 +26,9 @@ class PopularItem extends Component {
               <Text>Start: </Text>
               <Text>{stargazers_count}</Text>
             </View>
-            {FavoriteButton}
+            {this._renderFavoriteIcon()}
           </View>
-        </View>
+        </>
       </TouchableOpacity>
     );
   }

@@ -10,11 +10,12 @@ import NavigatorUtil from '../navigator/NavigatorUtil';
 export default class DetailPage extends Component {
   constructor(props) {
     super(props);
-    const { data } = this.props.navigation.state.params;
+    const { data, isFavorite } = this.props.navigation.state.params;
     this.state = {
       title: data.full_name || data.fullName,
       uri: data.html_url || GITHUB_URL + data.fullName,
-      canGoBack: false // WebView 返回上一页标识
+      canGoBack: false, // WebView 返回上一页标识
+      isFavorite
     };
   }
 
@@ -33,10 +34,26 @@ export default class DetailPage extends Component {
     });
   };
 
+  onFavorite = () => {
+    this.setState(prevState=>{
+      const {onFavorite, callback} =  this.props.navigation.state.params;
+      const isFavorite = !prevState.isFavorite;
+      onFavorite(isFavorite);
+      callback();
+      return{
+        isFavorite
+      }
+    });
+  };
+
   renderRightButton = () => (
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <TouchableOpacity onPress={() => {}}>
-        <FontAwesome size={24} name="star-o" color="#fff" />
+      <TouchableOpacity onPress={this.onFavorite}>
+        <FontAwesome
+          size={24}
+          name={this.state.isFavorite ? 'star' : 'star-o'}
+          color="#fff"
+        />
       </TouchableOpacity>
       {ViewUtil.renderShareButton()}
     </View>

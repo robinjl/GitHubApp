@@ -2,9 +2,11 @@ import { combineReducers } from 'redux';
 import theme from './theme';
 import popular from './popular';
 import trending from './trending';
+import favorite from './favorite';
 
 export default combineReducers({
   theme,
   popular,
-  trending
+  trending,
+  favorite
 });
